@@ -1,0 +1,19 @@
+node_modules/
+dist/
+.env
+.env.local
+
+# Noir build artifacts
+circuits/compliance/target/
+
+# Foundry
+contracts/cache/
+contracts/out/
+contracts/broadcast/
+
+# OS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
