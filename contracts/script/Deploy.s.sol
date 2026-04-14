@@ -9,8 +9,7 @@ import "../src/MockKycSBT.sol";
 
 contract Deploy is Script {
     function run() external {
-        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
-        vm.startBroadcast(deployerPrivateKey);
+        vm.startBroadcast();
 
         // 1. Deploy the ZK verifier (auto-generated from Noir circuit)
         HonkVerifier verifier = new HonkVerifier();
