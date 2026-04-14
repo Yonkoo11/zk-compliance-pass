@@ -1,18 +1,25 @@
 # Progress
 
 ## What Changed (Plain English)
+- Renamed project to "zkGate"
 - ZK circuit works end-to-end: compile, prove, verify all succeed
 - Solidity verifier auto-generated from the circuit
 - 3 smart contracts written: ComplianceGate, GatedVault, MockKycSBT
 - 10/10 Foundry tests pass
 - Calendar events + reminders set for deadline (Apr 15) and pitch (Apr 23)
 - Project added to PROJECTS.md
+- Frontend built: dark split-screen UI with Identity Wallet + Trading Wallet panels
+- Wallet connect with auto-switch to HashKey testnet
+- KYC status reader from MockKycSBT
+- In-browser ZK proof generation via noir_js + bb.js
+- Contract interaction: submit proof, deposit, withdraw
+- Vite builds successfully (453 modules, 3.7s)
 
 ## Current State
 - Phase 0: Setup DONE
 - Phase 1: Circuit DONE (nargo compile + bb prove + bb verify all pass)
 - Phase 2: Contracts DONE - all 4 deployed to HashKey testnet (Chain ID 133)
-- Phase 3: Frontend NOT STARTED
+- Phase 3: Frontend BUILT (not yet tested end-to-end with real wallet)
 - Phase 4: Polish NOT STARTED
 
 ## Deployed Contract Addresses (HashKey Testnet, Chain ID 133)
@@ -46,12 +53,20 @@
 - Faucet requires browser + reCAPTCHA (can't automate)
 
 ## Next Steps
-1. Build frontend: Vite + vanilla JS + @noir-lang/noir_js + @aztec/bb.js
-2. Key challenge: pedersen hash in JS must match Noir's pedersen exactly (use @aztec/bb.js)
-3. In-browser proof generation flow
-4. End-to-end test: connect wallet -> read KYC -> generate proof -> submit -> deposit
-5. Polish: split-screen UI, proof animation, GitHub Pages deploy
-6. Submit BUIDL on DoraHacks
+1. End-to-end test: connect wallet -> read KYC -> generate proof -> submit -> deposit
+2. GitHub Pages deploy
+3. Polish: proof animation, README
+4. Record demo video
+5. Submit BUIDL on DoraHacks
+
+## Frontend Stack
+- Vite + vanilla JS, no framework
+- @noir-lang/noir_js@1.0.0-beta.20 + @aztec/bb.js@4.1.3
+- viem for chain interaction
+- Dev server: `cd frontend && npm run dev` (port 5173)
+- Build: `cd frontend && npm run build` -> dist/
+- Base path: /zk-compliance-pass/ (for GitHub Pages)
+- Demo uses hardcoded test values matching on-chain merkle root
 
 ## Key Files
 - circuits/compliance/src/main.nr — THE circuit (depth-10 merkle + level threshold + nullifier)
