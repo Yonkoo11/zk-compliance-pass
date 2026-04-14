@@ -1,0 +1,15 @@
+# Test inputs for ZK Compliance Pass
+# Computed using helper circuit
+
+# PUBLIC INPUTS
+merkle_root = "0x1c5e0b3f58661b92b7d2bad2b63f2c27063adf308b3b02f7d65cc3580b4c13e0"
+threshold = 1
+nullifier_hash = "0x27bf76d59941726dc948eed8f755c9af9e2e2a3ada0168bb20ea91991bcfa692"
+
+# PRIVATE INPUTS
+address_hash = "0x1234"
+kyc_level = 2
+salt = "0x5678"
+index = "0"
+hash_path = ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]
+nullifier_secret = "0xabcd"

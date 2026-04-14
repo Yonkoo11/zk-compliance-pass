@@ -1,0 +1,4 @@
+address_hash = "0x1234"
+kyc_level = 2
+salt = "0x5678"
+nullifier_secret = "0xabcd"
