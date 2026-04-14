@@ -11,35 +11,53 @@
 ## Current State
 - Phase 0: Setup DONE
 - Phase 1: Circuit DONE (nargo compile + bb prove + bb verify all pass)
-- Phase 2: Contracts written + tested. NOT YET DEPLOYED (need testnet HSK from faucet)
+- Phase 2: Contracts DONE - all 4 deployed to HashKey testnet (Chain ID 133)
 - Phase 3: Frontend NOT STARTED
 - Phase 4: Polish NOT STARTED
+
+## Deployed Contract Addresses (HashKey Testnet, Chain ID 133)
+- HonkVerifier: 0x5014eD2B51785e33F3E982C20a82ed20FF9Dd89c
+- ComplianceGate: 0x17e5737284Fc6A7a369B6a18505B561C8c195DE3
+- GatedVault: 0x3cc5520B3EE988f5dCBa1F8324A002F0a2ef993E
+- MockKycSBT: 0x5a62799Aef0577C2B4234Ddaa08Dc8B4ADe7Bfc5
+
+## On-Chain State (verified)
+- MockKycSBT: deployer address seeded with KYC level 2, ensName "alice.hsk"
+- ComplianceGate: merkle root set to 0x1c5e0b3f58661b92b7d2bad2b63f2c27063adf308b3b02f7d65cc3580b4c13e0
+- Deployer: 0x018d8108a87E267d3d2949672DbBC1c4F74C72be
 
 ## Toolchain Versions
 - nargo: 1.0.0-beta.20
 - bb: 5.0.0-nightly.20260324
 - forge: 1.4.4-stable
-- Target npm: @noir-lang/noir_js@1.0.0-beta.20, @aztec/bb.js@4.1.3
-
-## Deployment Wallet
-- Address: 0x018d8108a87E267d3d2949672DbBC1c4F74C72be
-- Needs: testnet HSK from https://hashkeychain.net/faucet (requires reCAPTCHA)
+- npm packages needed: @noir-lang/noir_js@1.0.0-beta.20, @aztec/bb.js@4.1.3
 
 ## Test Values (from helper circuit)
+- address_hash: 0x1234, kyc_level: 2, salt: 0x5678, nullifier_secret: 0xabcd
 - leaf: 0x1dc5711b713bda9ca230971f276f181fdf4813cb2700ea0a2931fd932d8c06bf
 - nullifier: 0x27bf76d59941726dc948eed8f755c9af9e2e2a3ada0168bb20ea91991bcfa692
 - merkle_root: 0x1c5e0b3f58661b92b7d2bad2b63f2c27063adf308b3b02f7d65cc3580b4c13e0
+- index: 0, hash_path: all zeros (depth 10)
+
+## Build Notes
+- foundry.toml: optimizer_runs=1 to keep HonkVerifier under 24KB (was 25175, now 24245)
+- via_ir=false (caused stack-too-deep with the verifier)
+- --legacy flag needed for HashKey testnet transactions
+- Faucet requires browser + reCAPTCHA (can't automate)
 
 ## Next Steps
-1. USER: Get testnet HSK from faucet for 0x018d8108a87E267d3d2949672DbBC1c4F74C72be
-2. Deploy contracts to HashKey testnet
-3. Build frontend (Vite + vanilla JS + noir_js for browser proving)
-4. End-to-end test
-5. Polish + submit BUIDL
+1. Build frontend: Vite + vanilla JS + @noir-lang/noir_js + @aztec/bb.js
+2. Key challenge: pedersen hash in JS must match Noir's pedersen exactly (use @aztec/bb.js)
+3. In-browser proof generation flow
+4. End-to-end test: connect wallet -> read KYC -> generate proof -> submit -> deposit
+5. Polish: split-screen UI, proof animation, GitHub Pages deploy
+6. Submit BUIDL on DoraHacks
 
 ## Key Files
-- circuits/compliance/src/main.nr — THE circuit
-- contracts/src/ComplianceGate.sol — Main contract
-- contracts/src/GatedVault.sol — Demo vault
-- contracts/src/ComplianceVerifier.sol — Auto-generated verifier (2460 lines)
-- contracts/src/MockKycSBT.sol — Fallback KYC mock
+- circuits/compliance/src/main.nr — THE circuit (depth-10 merkle + level threshold + nullifier)
+- contracts/src/ComplianceGate.sol — Main contract (verify proof, mark compliant)
+- contracts/src/GatedVault.sol — Demo vault (deposit requires compliance)
+- contracts/src/ComplianceVerifier.sol — Auto-generated HonkVerifier (2460 lines)
+- contracts/src/MockKycSBT.sol — Fallback KYC mock (same interface as real IKycSBT)
+- circuits/compliance/Prover.toml — Working test inputs
+- .env — Deployment private key (DO NOT READ)
