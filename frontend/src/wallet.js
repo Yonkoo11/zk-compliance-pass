@@ -25,7 +25,8 @@ export async function switchToHashKey() {
       params: [{ chainId: HASHKEY_TESTNET.chainId }],
     });
   } catch (err) {
-    if (err.code === 4902) {
+    // 4902 = chain not added, but some wallets use different codes or messages
+    if (err.code === 4902 || err.code === -32603 || (err.message && err.message.includes('Unrecognized chain'))) {
       await window.ethereum.request({
         method: 'wallet_addEthereumChain',
         params: [HASHKEY_TESTNET],
