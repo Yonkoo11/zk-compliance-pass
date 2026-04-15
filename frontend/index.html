@@ -15,99 +15,145 @@
 <body>
   <header>
     <div class="header-left">
-      <h1>zkGate</h1>
-      <span class="subtitle">Prove KYC compliance without revealing identity</span>
+      <span class="logo"><span class="logo-zk">zk</span><span class="logo-gate">Gate</span></span>
+      <span class="tagline">ZK compliance on HashKey Chain</span>
     </div>
-    <button id="connect-btn" class="btn btn-primary">Connect Wallet</button>
+    <button id="connect-btn" class="btn btn-connect">Connect Wallet</button>
   </header>
 
   <main>
-    <section class="panel" id="identity-panel">
-      <div class="panel-header">
-        <div class="panel-icon">&#128274;</div>
-        <h2>Identity Wallet</h2>
+    <!-- Step 1: Connect -->
+    <div id="step-connect" class="step active">
+      <div class="connect-card">
+        <div class="connect-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <h2 class="connect-title">Private KYC verification</h2>
+        <p class="connect-desc">Prove your compliance level meets a threshold without revealing your identity or KYC data. Powered by zero-knowledge proofs on HashKey Chain.</p>
+        <button id="connect-cta" class="btn btn-cta">Connect Wallet</button>
       </div>
-      <div class="panel-body">
-        <div class="info-row">
-          <span class="label">Address</span>
-          <span id="id-address" class="value mono">Not connected</span>
-        </div>
-        <div class="info-row">
-          <span class="label">KYC Level</span>
-          <span id="kyc-level" class="value">--</span>
-        </div>
-        <div class="info-row">
-          <span class="label">ENS Name</span>
-          <span id="ens-name" class="value">--</span>
-        </div>
-        <div class="info-row">
-          <span class="label">Status</span>
-          <span id="kyc-status" class="value">--</span>
+    </div>
+
+    <!-- Step 2: KYC Status -->
+    <div id="step-kyc" class="step">
+      <div class="kyc-card">
+        <div class="kyc-header">
+          <div class="kyc-badge">
+            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div class="kyc-header-text">
+            <h3>KYC Credential</h3>
+            <span id="kyc-address">Loading...</span>
+          </div>
         </div>
 
-        <div class="divider"></div>
-
-        <h3>Generate ZK Proof</h3>
-        <p class="hint">Proves your KYC level meets the threshold without revealing your identity. In production, different wallets are used for identity and trading. This demo uses the same wallet for simplicity.</p>
-        <div class="input-group">
-          <label for="threshold-input">Minimum KYC Level</label>
-          <select id="threshold-input">
-            <option value="1" selected>Level 1 - Basic</option>
-            <option value="2">Level 2 - Advanced</option>
-            <option value="3">Level 3 - Professional</option>
-          </select>
+        <div class="kyc-field">
+          <span class="field-label">Level</span>
+          <span class="field-value" id="kyc-level">--</span>
         </div>
-        <button id="generate-btn" class="btn btn-accent" disabled>Generate ZK Proof</button>
-        <div id="proof-status" class="status-box hidden"></div>
+        <div class="kyc-field">
+          <span class="field-label">ENS Name</span>
+          <span class="field-value" id="ens-name">--</span>
+        </div>
+        <div class="kyc-field">
+          <span class="field-label">Status</span>
+          <span class="field-value" id="kyc-status">--</span>
+        </div>
+
+        <div class="kyc-privacy-note">
+          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          Your identity stays private. Only your compliance is proven.
+        </div>
+
+        <div class="kyc-actions">
+          <button id="generate-btn" class="btn btn-proof" disabled>Generate ZK Proof</button>
+          <div id="proof-status" class="status-box hidden"></div>
+        </div>
       </div>
-    </section>
+    </div>
 
-    <section class="panel" id="trading-panel">
-      <div class="panel-header">
-        <div class="panel-icon">&#128176;</div>
-        <h2>Trading Wallet</h2>
-      </div>
-      <div class="panel-body">
-        <div class="info-row">
-          <span class="label">Address</span>
-          <span id="trade-address" class="value mono">Not connected</span>
-        </div>
-        <div class="info-row">
-          <span class="label">Compliance</span>
-          <span id="compliance-status" class="value status-pending">Not verified</span>
-        </div>
-        <div class="info-row">
-          <span class="label">Vault Balance</span>
-          <span id="vault-balance" class="value">0 HSK</span>
+    <!-- Step 3: Proof Generation -->
+    <div id="step-proof" class="step">
+      <div class="proof-card">
+        <h3 class="proof-title">Generating ZK Proof</h3>
+
+        <div class="proof-stages">
+          <div class="proof-stage" id="stage-1">
+            <div class="stage-indicator">
+              <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            </div>
+            <div class="stage-text">
+              <div class="stage-label">Computing witness</div>
+              <div class="stage-desc">Preparing private inputs</div>
+            </div>
+          </div>
+
+          <div class="proof-stage" id="stage-2">
+            <div class="stage-indicator">
+              <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div class="stage-text">
+              <div class="stage-label">Generating proof</div>
+              <div class="stage-desc">Creating zero-knowledge proof</div>
+            </div>
+          </div>
+
+          <div class="proof-stage" id="stage-3">
+            <div class="stage-indicator">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="stage-text">
+              <div class="stage-label">Proof ready</div>
+              <div class="stage-desc">Verified locally, ready for chain</div>
+            </div>
+          </div>
         </div>
 
-        <div class="divider"></div>
+        <div class="proof-status-msg" id="proof-time-msg"></div>
 
-        <h3>Submit Proof On-Chain</h3>
-        <button id="submit-btn" class="btn btn-accent" disabled>Submit ZK Proof</button>
+        <button id="submit-btn" class="btn btn-cta" disabled>Submit Proof On-Chain</button>
         <div id="submit-status" class="status-box hidden"></div>
-
-        <div class="divider"></div>
-
-        <h3>Gated Vault</h3>
-        <p class="hint">Deposit HSK into the regulated vault (requires compliance).</p>
-        <div class="input-group">
-          <label for="deposit-input">Amount (HSK)</label>
-          <input type="number" id="deposit-input" placeholder="0.01" step="0.001" min="0" />
-        </div>
-        <div class="btn-row">
-          <button id="deposit-btn" class="btn btn-accent" disabled>Deposit</button>
-          <button id="withdraw-btn" class="btn btn-secondary" disabled>Withdraw All</button>
-        </div>
-        <div id="vault-status" class="status-box hidden"></div>
       </div>
-    </section>
+    </div>
+
+    <!-- Step 4: Compliant -->
+    <div id="step-compliant" class="step">
+      <div class="compliant-card">
+        <div class="compliance-badge" id="compliance-badge">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h2 class="compliant-title">Compliant</h2>
+        <p class="compliant-desc">Your wallet is verified without revealing your identity. You can now access gated protocols.</p>
+
+        <div class="vault-section">
+          <div class="vault-header">
+            <h4>Gated Vault</h4>
+            <span class="vault-balance" id="vault-balance">0 HSK</span>
+          </div>
+          <div class="vault-input-row">
+            <input type="number" id="deposit-input" placeholder="0.01" step="0.001" min="0" />
+          </div>
+          <div class="vault-btn-row">
+            <button id="deposit-btn" class="btn btn-cta">Deposit</button>
+            <button id="withdraw-btn" class="btn btn-secondary">Withdraw All</button>
+          </div>
+          <div id="vault-status" class="status-box hidden"></div>
+        </div>
+      </div>
+    </div>
   </main>
 
   <footer>
-    <div id="log" class="log-area">
-      <div class="log-header">Activity Log</div>
-      <div id="log-entries"></div>
+    <div class="log-container" id="log-container">
+      <button class="log-toggle" id="log-toggle" aria-expanded="false" aria-controls="log-entries">
+        <span>Activity Log</span>
+        <svg class="log-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div id="log-entries" role="log" aria-live="polite"></div>
+    </div>
+    <div class="chain-indicator">
+      <span class="chain-dot"></span>
+      <span class="chain-name">HashKey Testnet</span>
     </div>
   </footer>
 
