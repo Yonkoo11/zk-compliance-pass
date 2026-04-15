@@ -8,12 +8,22 @@
 - 10/10 Foundry tests pass
 - Calendar events + reminders set for deadline (Apr 15) and pitch (Apr 23)
 - Project added to PROJECTS.md
-- Frontend built: dark split-screen UI with Identity Wallet + Trading Wallet panels
+- Frontend completely redesigned: centered single-card layout replacing the old split-screen
+- The app now walks you through 4 clear steps instead of showing everything at once:
+  1. A connect screen with a single button
+  2. Your KYC credential card with a privacy note
+  3. A proof generation screen where you watch 3 stages light up as the proof builds
+  4. A "Compliant" badge with pulsing glow, plus deposit/withdraw for the vault
+- Activity log is now collapsible (starts closed, click to expand)
+- Green pulsing dot at the bottom shows you're on HashKey Testnet
+- Background has subtle purple and teal gradient glow instead of flat black
+- Noise texture overlay for visual depth
+- All buttons are pill-shaped with glow effects
 - Wallet connect with auto-switch to HashKey testnet
 - KYC status reader from MockKycSBT
 - In-browser ZK proof generation via noir_js + bb.js
 - Contract interaction: submit proof, deposit, withdraw
-- Vite builds successfully (453 modules, 3.7s)
+- Vite builds successfully
 
 ## Current State
 - Phase 0: Setup DONE
