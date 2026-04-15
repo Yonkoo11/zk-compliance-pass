@@ -134,3 +134,17 @@ export function truncateAddress(addr) {
   if (!addr) return 'Not connected';
   return addr.slice(0, 6) + '...' + addr.slice(-4);
 }
+
+export function showConnectError(message) {
+  const el = document.getElementById('connect-error');
+  if (!el) return;
+  el.textContent = message;
+  el.classList.remove('hidden');
+}
+
+export function hideConnectError() {
+  const el = document.getElementById('connect-error');
+  if (!el) return;
+  el.textContent = '';
+  el.classList.add('hidden');
+}

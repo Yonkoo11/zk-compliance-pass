@@ -71,12 +71,7 @@ body {
   color: var(--text-primary);
   background: var(--bg-base);
   min-height: 100vh;
-
-  /* Liveness: dual radial gradients */
-  background-image:
-    radial-gradient(ellipse at 15% 0%, rgba(124, 110, 240, 0.10) 0%, transparent 55%),
-    radial-gradient(ellipse at 85% 100%, rgba(0, 212, 170, 0.09) 0%, transparent 55%);
-  background-attachment: fixed;
+  overflow-x: hidden;
 }
 
 /* Noise texture overlay via SVG filter */
@@ -93,6 +88,89 @@ body::before {
 }
 
 /* ========================================
+   Ambient Orbs (liveness — always moving)
+   ======================================== */
+
+.ambient-orbs {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform;
+}
+
+.orb-1 {
+  width: 700px;
+  height: 700px;
+  top: -25%;
+  left: -10%;
+  background: radial-gradient(circle, rgba(124, 110, 240, 0.30) 0%, rgba(124, 110, 240, 0) 70%);
+  animation: orbDrift1 18s ease-in-out infinite;
+}
+
+.orb-2 {
+  width: 600px;
+  height: 600px;
+  bottom: -15%;
+  right: -10%;
+  background: radial-gradient(circle, rgba(0, 212, 170, 0.25) 0%, rgba(0, 212, 170, 0) 70%);
+  animation: orbDrift2 22s ease-in-out infinite;
+}
+
+.orb-3 {
+  width: 400px;
+  height: 400px;
+  top: 30%;
+  left: 40%;
+  background: radial-gradient(circle, rgba(124, 110, 240, 0.15) 0%, rgba(124, 110, 240, 0) 70%);
+  animation: orbDrift3 15s ease-in-out infinite;
+}
+
+@keyframes orbDrift1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, 40px) scale(1.05); }
+  66% { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+@keyframes orbDrift2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-25px, -30px) scale(1.08); }
+  66% { transform: translate(15px, -15px) scale(0.92); }
+}
+
+@keyframes orbDrift3 {
+  0%, 100% { transform: translate(-50%, 0) scale(1); opacity: 0.6; }
+  50% { transform: translate(-50%, -30px) scale(1.1); opacity: 1; }
+}
+
+/* ========================================
+   Connect Error (visible on card)
+   ======================================== */
+
+.connect-error {
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: var(--radius-sm);
+  color: #fca5a5;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+  animation: stepIn var(--dur-step) var(--ease-out-expo) forwards;
+}
+
+.connect-error.hidden {
+  display: none;
+}
+
+/* ========================================
    Layout
    ======================================== */
 
@@ -103,9 +181,20 @@ header {
   align-items: center;
   justify-content: space-between;
   padding: 16px 24px;
-  border-bottom: 1px solid var(--border);
-  background: rgba(20, 20, 32, 0.5);
-  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(14, 14, 22, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+header::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(124, 110, 240, 0.3), rgba(0, 212, 170, 0.2), transparent);
 }
 
 .header-left {
@@ -197,11 +286,18 @@ footer {
    ======================================== */
 
 .connect-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
+  background: rgba(20, 20, 32, 0.55);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius);
   padding: 48px 32px;
   text-align: center;
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.25),
+    0 4px 6px -4px rgba(0, 0, 0, 0.2),
+    0 0 60px rgba(124, 110, 240, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .connect-icon {
@@ -209,11 +305,18 @@ footer {
   height: 56px;
   margin: 0 auto 24px;
   border-radius: var(--radius-sm);
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
+  background: var(--purple-glow);
+  border: 1px solid rgba(124, 110, 240, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 0 24px rgba(124, 110, 240, 0.15);
+  animation: iconBreath 4s ease-in-out infinite;
+}
+
+@keyframes iconBreath {
+  0%, 100% { box-shadow: 0 0 24px rgba(124, 110, 240, 0.15); }
+  50% { box-shadow: 0 0 36px rgba(124, 110, 240, 0.25); }
 }
 
 .connect-icon svg {
@@ -247,10 +350,17 @@ footer {
    ======================================== */
 
 .kyc-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
+  background: rgba(20, 20, 32, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 3px solid rgba(124, 110, 240, 0.4);
   border-radius: var(--radius);
   padding: 28px 24px;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.2),
+    0 2px 4px -2px rgba(0, 0, 0, 0.15),
+    0 0 30px rgba(124, 110, 240, 0.06);
 }
 
 .kyc-header {
@@ -345,10 +455,16 @@ footer {
    ======================================== */
 
 .proof-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
+  background: rgba(20, 20, 32, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 3px solid rgba(124, 110, 240, 0.4);
   border-radius: var(--radius);
   padding: 28px 24px;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.2),
+    0 0 30px rgba(124, 110, 240, 0.06);
 }
 
 .proof-title {
@@ -480,11 +596,17 @@ footer {
    ======================================== */
 
 .compliant-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
+  background: rgba(20, 20, 32, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 212, 170, 0.12);
+  border-top: 3px solid rgba(0, 212, 170, 0.4);
   border-radius: var(--radius);
   padding: 32px 24px;
   text-align: center;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.2),
+    0 0 40px rgba(0, 212, 170, 0.08);
 }
 
 .compliance-badge {
@@ -644,12 +766,16 @@ footer {
   background: var(--accent);
   color: var(--bg-base);
   font-weight: 600;
-  box-shadow: 0 0 30px rgba(0, 212, 170, 0.15);
+  box-shadow: 0 0 30px rgba(0, 212, 170, 0.2), 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: background var(--dur-normal) var(--ease-out),
+              box-shadow var(--dur-normal) var(--ease-out),
+              transform var(--dur-normal) var(--ease-out);
 }
 
 .btn-cta:hover:not(:disabled) {
   background: #00e6b8;
-  box-shadow: 0 0 40px rgba(0, 212, 170, 0.22);
+  box-shadow: 0 0 50px rgba(0, 212, 170, 0.3), 0 6px 16px rgba(0, 0, 0, 0.3);
+  transform: translateY(-1px);
 }
 
 /* Header connect button */
@@ -687,12 +813,16 @@ footer {
   background: var(--purple);
   color: white;
   font-weight: 600;
-  box-shadow: 0 0 24px rgba(124, 110, 240, 0.15);
+  box-shadow: 0 0 24px rgba(124, 110, 240, 0.2), 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: background var(--dur-normal) var(--ease-out),
+              box-shadow var(--dur-normal) var(--ease-out),
+              transform var(--dur-normal) var(--ease-out);
 }
 
 .btn-proof:hover:not(:disabled) {
   background: #8b7ff5;
-  box-shadow: 0 0 32px rgba(124, 110, 240, 0.22);
+  box-shadow: 0 0 40px rgba(124, 110, 240, 0.3), 0 6px 16px rgba(0, 0, 0, 0.3);
+  transform: translateY(-1px);
 }
 
 /* ========================================
@@ -731,8 +861,10 @@ input[type="number"]::placeholder {
    ======================================== */
 
 .log-container {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
+  background: rgba(20, 20, 32, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: var(--radius);
   overflow: hidden;
 }
@@ -956,5 +1088,8 @@ input[type="number"]::placeholder {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+  .ambient-orbs {
+    display: none;
   }
 }

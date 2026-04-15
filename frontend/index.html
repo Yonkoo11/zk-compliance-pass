@@ -13,6 +13,11 @@
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
+  <div class="ambient-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
   <header>
     <div class="header-left">
       <span class="logo"><span class="logo-zk">zk</span><span class="logo-gate">Gate</span></span>
@@ -31,6 +36,7 @@
         <h2 class="connect-title">Private KYC verification</h2>
         <p class="connect-desc">Prove your compliance level meets a threshold without revealing your identity or KYC data. Powered by zero-knowledge proofs on HashKey Chain.</p>
         <button id="connect-cta" class="btn btn-cta">Connect Wallet</button>
+        <div id="connect-error" class="connect-error hidden"></div>
       </div>
     </div>
 

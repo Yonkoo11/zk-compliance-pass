@@ -4,7 +4,8 @@ import { initNoir, generateProof, formatProofForChain, getNullifierFromProof } f
 import { submitProof, deposit, withdraw, isCompliant, getBalance, formatEther } from './contracts.js';
 import {
   log, showStatus, setText, setClass, enableBtn, truncateAddress,
-  showStep, animateProofStage, resetProofStages, showComplianceBadge, initLogToggle
+  showStep, animateProofStage, resetProofStages, showComplianceBadge, initLogToggle,
+  showConnectError, hideConnectError
 } from './ui.js';
 
 // Demo mode values (match the seeded on-chain state)
@@ -38,6 +39,7 @@ async function handleConnect() {
   const ctaBtn = document.getElementById('connect-cta');
 
   try {
+    hideConnectError();
     headerBtn.textContent = 'Connecting...';
     headerBtn.disabled = true;
     if (ctaBtn) {
@@ -49,6 +51,13 @@ async function handleConnect() {
     log(`Wallet connected: ${truncateAddress(account)}`, 'success');
     await onConnected(account);
   } catch (err) {
+    let userMsg = err.message;
+    if (userMsg.includes('MetaMask') || userMsg.includes('install')) {
+      userMsg = 'MetaMask not detected. Please install it or open this page in a browser with MetaMask.';
+    } else if (userMsg.includes('User rejected') || userMsg.includes('denied')) {
+      userMsg = 'Connection was rejected. Click Connect Wallet to try again.';
+    }
+    showConnectError(userMsg);
     log(`Connection failed: ${err.message}`, 'error');
     headerBtn.textContent = 'Connect Wallet';
     headerBtn.disabled = false;
