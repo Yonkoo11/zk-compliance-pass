@@ -19,8 +19,8 @@
 - Phase 0: Setup DONE
 - Phase 1: Circuit DONE (nargo compile + bb prove + bb verify all pass)
 - Phase 2: Contracts DONE - all 4 deployed to HashKey testnet (Chain ID 133)
-- Phase 3: Frontend BUILT (not yet tested end-to-end with real wallet)
-- Phase 4: Polish NOT STARTED
+- Phase 3: Frontend DEPLOYED to GitHub Pages (not yet tested end-to-end with real wallet)
+- Phase 4: Polish DONE (README, meta tags, favicon, deploy workflow, critical bug fixes)
 
 ## Deployed Contract Addresses (HashKey Testnet, Chain ID 133)
 - HonkVerifier: 0x5014eD2B51785e33F3E982C20a82ed20FF9Dd89c
@@ -52,12 +52,16 @@
 - --legacy flag needed for HashKey testnet transactions
 - Faucet requires browser + reCAPTCHA (can't automate)
 
+## Live URL
+https://yonkoo11.github.io/zk-compliance-pass/
+
+## GitHub Repo
+https://github.com/Yonkoo11/zk-compliance-pass
+
 ## Next Steps
-1. End-to-end test: connect wallet -> read KYC -> generate proof -> submit -> deposit
-2. GitHub Pages deploy
-3. Polish: proof animation, README
-4. Record demo video
-5. Submit BUIDL on DoraHacks
+1. END-TO-END TEST with real wallet (CRITICAL - proof generation in browser is untested)
+2. Record demo video
+3. Submit BUIDL on DoraHacks
 
 ## Frontend Stack
 - Vite + vanilla JS, no framework
