@@ -1,21 +1,22 @@
 import { connectWallet, getAccount, onAccountChange } from './wallet.js';
 import { getKycStatus } from './kyc.js';
-import { initNoir, generateProof, formatProofForChain } from './proof.js';
+import { initNoir, generateProof, formatProofForChain, getNullifierFromProof } from './proof.js';
 import { submitProof, deposit, withdraw, isCompliant, getBalance, formatEther } from './contracts.js';
-import { log, showStatus, hideStatus, setText, setClass, enableBtn, truncateAddress } from './ui.js';
+import { log, showStatus, setText, setClass, enableBtn, truncateAddress } from './ui.js';
 
 // Demo mode values (match the seeded on-chain state)
+// In production, these would be computed from on-chain KYC data
 const DEMO_INPUTS = {
   merkle_root: '0x1c5e0b3f58661b92b7d2bad2b63f2c27063adf308b3b02f7d65cc3580b4c13e0',
   address_hash: '0x1234',
-  kyc_level: 2,
+  kyc_level: '2',
   salt: '0x5678',
   index: '0',
   hash_path: ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
   nullifier_secret: '0xabcd',
 };
 
-const DEMO_NULLIFIER = '0x27bf76d59941726dc948eed8f755c9af9e2e2a3ada0168bb20ea91991bcfa692';
+const EXPLORER_URL = 'https://testnet-explorer.hsk.xyz/tx/';
 
 let generatedProof = null;
 
@@ -42,7 +43,7 @@ async function onConnected(account) {
   setText('trade-address', truncateAddress(account));
 
   // Load KYC status
-  log('Reading KYC status...');
+  log('Reading KYC status from on-chain SBT...');
   const kyc = await getKycStatus(account);
   setText('kyc-level', kyc.level > 0 ? `Level ${kyc.level} - ${kyc.levelName}` : 'No KYC');
   setText('ens-name', kyc.ensName);
@@ -50,28 +51,29 @@ async function onConnected(account) {
   setClass('kyc-status', kyc.status === 'Approved' ? 'status-compliant' : 'status-pending');
 
   if (kyc.level > 0) {
-    log(`KYC Level ${kyc.level} (${kyc.levelName}) detected`, 'success');
+    log(`KYC Level ${kyc.level} (${kyc.levelName}) found`, 'success');
     enableBtn('generate-btn');
   } else {
-    log('No KYC found for this address', 'info');
+    log('No KYC found. Using demo mode with test values.', 'info');
+    enableBtn('generate-btn');
   }
 
-  // Check compliance
+  // Check existing compliance
   const compliant = await isCompliant(account);
   if (compliant) {
     setText('compliance-status', 'Verified');
     setClass('compliance-status', 'status-compliant');
     enableBtn('deposit-btn');
     enableBtn('withdraw-btn');
-    log('Address is already marked compliant on-chain', 'success');
+    log('Already marked compliant on-chain', 'success');
   }
 
   // Load vault balance
   await refreshBalance(account);
 
-  // Start initializing Noir in background
+  // Start initializing ZK system in background
   initNoir((msg) => log(msg, 'info')).catch((err) => {
-    log(`ZK init warning: ${err.message}`, 'error');
+    log(`ZK init failed: ${err.message}. Proof generation may not work in this browser.`, 'error');
   });
 }
 
@@ -92,19 +94,19 @@ document.getElementById('generate-btn').addEventListener('click', async () => {
   btn.textContent = 'Generating...';
 
   try {
-    const threshold = parseInt(document.getElementById('threshold-input').value);
+    const threshold = document.getElementById('threshold-input').value;
     const inputs = {
       ...DEMO_INPUTS,
       threshold,
-      nullifier_hash: DEMO_NULLIFIER,
+      nullifier_hash: '0x27bf76d59941726dc948eed8f755c9af9e2e2a3ada0168bb20ea91991bcfa692',
     };
 
-    showStatus('proof-status', 'Generating ZK proof... This may take 30-60 seconds.', 'loading');
+    showStatus('proof-status', 'Generating ZK proof... This takes 30-60 seconds in the browser.', 'loading');
 
     generatedProof = await generateProof(inputs, (msg) => log(msg, 'info'));
 
-    showStatus('proof-status', 'Proof generated! Ready to submit on-chain.', 'success');
-    log('ZK proof generated successfully', 'success');
+    showStatus('proof-status', 'Proof generated! Click "Submit ZK Proof" to verify on-chain.', 'success');
+    log('ZK proof generated', 'success');
     enableBtn('submit-btn');
   } catch (err) {
     showStatus('proof-status', `Proof generation failed: ${err.message}`, 'error');
@@ -126,15 +128,15 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
   try {
     const threshold = parseInt(document.getElementById('threshold-input').value);
     const proofHex = formatProofForChain(generatedProof);
-    const nullifierBytes32 = DEMO_NULLIFIER.padEnd(66, '0').slice(0, 66);
+    const nullifierHash = getNullifierFromProof(generatedProof);
 
-    showStatus('submit-status', 'Submitting proof to ComplianceGate...', 'loading');
-    log('Submitting ZK proof on-chain...', 'info');
+    showStatus('submit-status', 'Submitting proof to ComplianceGate contract...', 'loading');
+    log('Sending proof transaction...', 'info');
 
-    const { hash } = await submitProof(proofHex, threshold, nullifierBytes32);
+    const { hash } = await submitProof(proofHex, threshold, nullifierHash);
 
     showStatus('submit-status', 'Compliance verified on-chain!', 'success');
-    log(`Proof accepted! Tx: ${truncateAddress(hash)}`, 'success');
+    log(`Proof accepted! View tx: ${EXPLORER_URL}${hash}`, 'success');
 
     setText('compliance-status', 'Verified');
     setClass('compliance-status', 'status-compliant');
@@ -142,8 +144,11 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
     enableBtn('withdraw-btn');
     enableBtn('submit-btn', false);
   } catch (err) {
-    const msg = err.message.includes('Nullifier') ? 'This proof was already used.' : err.message;
-    showStatus('submit-status', `Submission failed: ${msg}`, 'error');
+    let msg = err.message;
+    if (msg.includes('Nullifier')) msg = 'This proof was already used. Generate a new one with a different nullifier.';
+    else if (msg.includes('User rejected')) msg = 'Transaction rejected by user.';
+    else if (msg.includes('insufficient')) msg = 'Insufficient HSK for gas fees.';
+    showStatus('submit-status', `Failed: ${msg}`, 'error');
     log(`Submit error: ${msg}`, 'error');
     btn.disabled = false;
   }
@@ -152,9 +157,10 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
 
 // -- Deposit --
 document.getElementById('deposit-btn').addEventListener('click', async () => {
-  const amount = document.getElementById('deposit-input').value;
-  if (!amount || parseFloat(amount) <= 0) {
-    showStatus('vault-status', 'Enter an amount to deposit.', 'error');
+  const amountStr = document.getElementById('deposit-input').value;
+  const amount = parseFloat(amountStr);
+  if (!amountStr || amount <= 0 || amount > 1000) {
+    showStatus('vault-status', 'Enter a valid amount (0 to 1000 HSK).', 'error');
     return;
   }
 
@@ -163,17 +169,19 @@ document.getElementById('deposit-btn').addEventListener('click', async () => {
   btn.textContent = 'Depositing...';
 
   try {
-    showStatus('vault-status', 'Depositing into gated vault...', 'loading');
-    log(`Depositing ${amount} HSK...`, 'info');
+    showStatus('vault-status', `Depositing ${amountStr} HSK into gated vault...`, 'loading');
+    log(`Depositing ${amountStr} HSK...`, 'info');
 
-    const { hash } = await deposit(amount);
+    const { hash } = await deposit(amountStr);
 
-    showStatus('vault-status', `Deposited ${amount} HSK!`, 'success');
-    log(`Deposit confirmed! Tx: ${truncateAddress(hash)}`, 'success');
+    showStatus('vault-status', `Deposited ${amountStr} HSK!`, 'success');
+    log(`Deposit confirmed! View tx: ${EXPLORER_URL}${hash}`, 'success');
 
     await refreshBalance(getAccount());
   } catch (err) {
-    const msg = err.message.includes('compliance') ? 'KYC compliance required. Submit your proof first.' : err.message;
+    let msg = err.message;
+    if (msg.includes('compliance')) msg = 'KYC compliance required. Submit your ZK proof first.';
+    else if (msg.includes('User rejected')) msg = 'Transaction rejected by user.';
     showStatus('vault-status', `Deposit failed: ${msg}`, 'error');
     log(`Deposit error: ${msg}`, 'error');
   } finally {
@@ -194,12 +202,15 @@ document.getElementById('withdraw-btn').addEventListener('click', async () => {
     const { hash } = await withdraw(account);
 
     showStatus('vault-status', 'Withdrawal complete!', 'success');
-    log(`Withdrawal confirmed! Tx: ${truncateAddress(hash)}`, 'success');
+    log(`Withdrawal confirmed! View tx: ${EXPLORER_URL}${hash}`, 'success');
 
     await refreshBalance(account);
   } catch (err) {
-    showStatus('vault-status', `Withdrawal failed: ${err.message}`, 'error');
-    log(`Withdraw error: ${err.message}`, 'error');
+    let msg = err.message;
+    if (msg.includes('User rejected')) msg = 'Transaction rejected by user.';
+    else if (msg.includes('Insufficient') || msg.includes('No balance')) msg = 'No balance to withdraw.';
+    showStatus('vault-status', `Withdrawal failed: ${msg}`, 'error');
+    log(`Withdraw error: ${msg}`, 'error');
   } finally {
     btn.textContent = 'Withdraw All';
     btn.disabled = false;
@@ -209,6 +220,8 @@ document.getElementById('withdraw-btn').addEventListener('click', async () => {
 // -- Account changes --
 onAccountChange(async (account) => {
   if (account) {
+    generatedProof = null;
+    enableBtn('submit-btn', false);
     await onConnected(account);
   } else {
     document.getElementById('connect-btn').textContent = 'Connect Wallet';
