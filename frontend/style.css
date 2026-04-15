@@ -225,17 +225,19 @@ footer {
 }
 
 .connect-title {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 600;
   letter-spacing: -0.02em;
-  margin-bottom: 8px;
+  line-height: 1.2;
+  margin-bottom: 10px;
 }
 
 .connect-desc {
-  font-size: 14px;
+  font-size: 15px;
+  line-height: 1.6;
   color: var(--text-secondary);
-  margin-bottom: 28px;
-  max-width: 320px;
+  margin-bottom: 32px;
+  max-width: 340px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -280,7 +282,7 @@ footer {
 }
 
 .kyc-header-text h3 {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   letter-spacing: -0.02em;
 }
@@ -302,23 +304,23 @@ footer {
 }
 
 .kyc-field .field-label {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text-secondary);
 }
 
 .kyc-field .field-value {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
   font-variant-numeric: tabular-nums;
 }
 
 .kyc-privacy-note {
   margin-top: 20px;
-  padding: 12px 16px;
+  padding: 14px 16px;
   background: var(--accent-deep);
   border: 1px solid rgba(0, 212, 170, 0.08);
   border-radius: var(--radius-sm);
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text-secondary);
   line-height: 1.5;
 }
@@ -350,7 +352,7 @@ footer {
 }
 
 .proof-title {
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 600;
   letter-spacing: -0.02em;
   margin-bottom: 24px;
@@ -405,14 +407,14 @@ footer {
 }
 
 .stage-text .stage-label {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
   color: var(--text-muted);
   transition: color var(--dur-slow) var(--ease-out-expo);
 }
 
 .stage-text .stage-desc {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-muted);
   margin-top: 2px;
   transition: color var(--dur-slow) var(--ease-out-expo);
@@ -467,10 +469,10 @@ footer {
 
 .proof-status-msg {
   text-align: center;
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text-secondary);
   margin-bottom: 20px;
-  min-height: 20px;
+  min-height: 22px;
 }
 
 /* ========================================
@@ -534,17 +536,19 @@ footer {
 }
 
 .compliant-title {
-  font-size: 22px;
+  font-size: 28px;
   font-weight: 700;
   letter-spacing: -0.02em;
+  line-height: 1.2;
   color: var(--accent);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .compliant-desc {
-  font-size: 14px;
+  font-size: 15px;
+  line-height: 1.6;
   color: var(--text-secondary);
-  margin-bottom: 28px;
+  margin-bottom: 32px;
   max-width: 340px;
   margin-left: auto;
   margin-right: auto;
@@ -564,13 +568,13 @@ footer {
 }
 
 .vault-header h4 {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   letter-spacing: -0.02em;
 }
 
 .vault-balance {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--accent);
   font-variant-numeric: tabular-nums;
@@ -738,16 +742,17 @@ input[type="number"]::placeholder {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 16px;
+  padding: 14px 16px;
   background: none;
   border: none;
   color: var(--text-muted);
   font-family: inherit;
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   cursor: pointer;
+  min-height: 48px;
 }
 
 .log-toggle:hover {
@@ -834,7 +839,7 @@ input[type="number"]::placeholder {
 }
 
 .chain-name {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-muted);
 }
 
