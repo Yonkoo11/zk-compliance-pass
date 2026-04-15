@@ -16,9 +16,13 @@
   4. A "Compliant" badge with pulsing glow, plus deposit/withdraw for the vault
 - Activity log is now collapsible (starts closed, click to expand)
 - Green pulsing dot at the bottom shows you're on HashKey Testnet
-- Background has subtle purple and teal gradient glow instead of flat black
+- Background has 3 ambient orbs (purple + teal) that slowly drift, giving it a living feel
+- All cards use glassmorphism (blur + translucent background), not flat surfaces
+- Header has a gradient accent line (purple to teal) at the bottom edge
+- Connect icon has a breathing glow animation
 - Noise texture overlay for visual depth
-- All buttons are pill-shaped with glow effects
+- All buttons are pill-shaped with glow effects + hover lift
+- Wallet connect errors now show visibly ON the card (not hidden in collapsed log)
 - Wallet connect with auto-switch to HashKey testnet
 - KYC status reader from MockKycSBT
 - In-browser ZK proof generation via noir_js + bb.js
@@ -29,8 +33,12 @@
 - Phase 0: Setup DONE
 - Phase 1: Circuit DONE (nargo compile + bb prove + bb verify all pass)
 - Phase 2: Contracts DONE - all 4 deployed to HashKey testnet (Chain ID 133)
-- Phase 3: Frontend DEPLOYED to GitHub Pages (not yet tested end-to-end with real wallet)
+- Phase 3: Frontend DEPLOYED to GitHub Pages
 - Phase 4: Polish DONE (README, meta tags, favicon, deploy workflow, critical bug fixes)
+- Design QA: PASSED (Phase 5 complete — liveness, typography, contrast, motion, accessibility all pass)
+- ZK proof: VERIFIED in Node.js (16KB proof, 3 public inputs, local verification passes)
+- Wallet connect: Error now shows on card, not hidden in collapsed log
+- NOT TESTED: In-browser WASM proof gen with real MetaMask wallet (Node.js works, browser untested)
 
 ## Deployed Contract Addresses (HashKey Testnet, Chain ID 133)
 - HonkVerifier: 0x5014eD2B51785e33F3E982C20a82ed20FF9Dd89c
